@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ecatalog_fic5/data/datasources/local_datasource.dart';
 import 'package:flutter_ecatalog_fic5/presentation/add_product_page.dart';
 import 'package:flutter_ecatalog_fic5/presentation/login_page.dart';
+import '../bloc/add_product/add_product_bloc.dart';
 import '../bloc/products/products_bloc.dart';
+import '../data/models/request/product_request_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -51,11 +53,11 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
               onPressed: () async {
-                await LocalDataSource().removeToken();
-                // ignore: use_build_context_synchronously
+                context.read<ProductsBloc>().add(ClearProductEvent());
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return const LoginPage();
                 }));
+                await LocalDataSource().removeToken();
               },
               icon: const Icon(Icons.logout))
         ],
@@ -80,9 +82,105 @@ class _HomePageState extends State<HomePage> {
                   return Card(
                     child: ListTile(
                       title: Text(
-                        state.data[index].title ?? '-',
+                        state.data.reversed.toList()[index].title ?? '-',
                       ),
                       subtitle: Text('${state.data[index].price}\$'),
+                      onTap: () {
+                        debugPrint('title ${state.data[index].title}');
+                        debugPrint('price ${state.data[index].price}');
+                        debugPrint(
+                            'description ${state.data[index].description}');
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Add Product'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  TextField(
+                                    controller: TextEditingController.fromValue(
+                                        TextEditingValue(
+                                            text:
+                                                '${state.data[index].title}')),
+                                    decoration: const InputDecoration(
+                                        labelText: 'title'),
+                                  ),
+                                  TextField(
+                                    controller: priceController,
+                                    decoration: const InputDecoration(
+                                        labelText: 'price'),
+                                  ),
+                                  TextField(
+                                    controller: descriptionController,
+                                    decoration: const InputDecoration(
+                                        labelText: 'description'),
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Cancel')),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                BlocConsumer<AddProductBloc, AddProductState>(
+                                  listener: (context, state) {
+                                    if (state is AddProductsLoaded) {
+                                      const SnackBar(
+                                        content:
+                                            Text('Update Product is Success'),
+                                      );
+                                      // context.read<ProductsBloc>().add(GetProductsEvent());
+                                      context.read<ProductsBloc>().add(
+                                          AddSingleProductsEvent(
+                                              data: state.model));
+                                      titleController!.clear();
+                                      priceController!.clear();
+                                      descriptionController!.clear();
+                                      Navigator.pop(context);
+                                    }
+                                    if (state is AddProductsError) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Update product is failed')),
+                                      );
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    if (state is AddProductsLoading) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                    return ElevatedButton(
+                                        onPressed: () {
+                                          final requestData =
+                                              ProductsRequestModel(
+                                                  title: titleController!.text,
+                                                  price:
+                                                      int.parse(priceController!
+                                                          .text),
+                                                  description:
+                                                      descriptionController!
+                                                          .text);
+                                          context.read<AddProductBloc>().add(
+                                              AddedProductEvent(
+                                                  model: requestData));
+                                        },
+                                        child: const Text('Update Product'));
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                     ),
                   );
                 },
@@ -133,45 +231,48 @@ class _HomePageState extends State<HomePage> {
           //         const SizedBox(
           //           width: 8,
           //         ),
-          //         BlocConsumer<AddProductBloc, AddProductState>(
-          //           listener: (context, state) {
-          //             if (state is AddProductsLoaded) {
-          //               const SnackBar(
-          //                 content: Text('Add Product Success'),
-          //               );
-          //               context.read<ProductsBloc>().add(GetProductsEvent());
-          //               titleController!.clear();
-          //               priceController!.clear();
-          //               descriptionController!.clear();
-          //               Navigator.pop(context);
-          //             }
-          //             if (state is AddProductsError) {
-          //               ScaffoldMessenger.of(context).showSnackBar(
-          //                 const SnackBar(content: Text('Add product failed')),
-          //               );
-          //             }
-          //           },
-          //           builder: (context, state) {
-          //             if (state is AddProductsLoading) {
-          //               return const Center(
-          //                 child: CircularProgressIndicator(),
-          //               );
-          //             }
-          //             return ElevatedButton(
-          //                 onPressed: () {
-          //                   final requestData = ProductsRequestModel(
-          //                       title: titleController!.text,
-          //                       price: int.parse(priceController!.text),
-          //                       description: descriptionController!.text);
-          //                   context
-          //                       .read<AddProductBloc>()
-          //                       .add(AddedProductEvent(model: requestData));
-          //                 },
-          //                 child: const Text('Add'));
-          //           },
-          //         ),
-          //       ],
-          //     );
+          // BlocConsumer<AddProductBloc, AddProductState>(
+          //   listener: (context, state) {
+          //     if (state is AddProductsLoaded) {
+          //       const SnackBar(
+          //         content: Text('Add Product Success'),
+          //       );
+          //       // context.read<ProductsBloc>().add(GetProductsEvent());
+          //       context
+          //           .read<ProductsBloc>()
+          //           .add(AddSingleProductsEvent(data: state.model));
+          //       titleController!.clear();
+          //       priceController!.clear();
+          //       descriptionController!.clear();
+          //       Navigator.pop(context);
+          //     }
+          //     if (state is AddProductsError) {
+          //       ScaffoldMessenger.of(context).showSnackBar(
+          //         const SnackBar(content: Text('Add product failed')),
+          //       );
+          //     }
+          //   },
+          //   builder: (context, state) {
+          //     if (state is AddProductsLoading) {
+          //       return const Center(
+          //         child: CircularProgressIndicator(),
+          //       );
+          //     }
+          //     return ElevatedButton(
+          //         onPressed: () {
+          //           final requestData = ProductsRequestModel(
+          //               title: titleController!.text,
+          //               price: int.parse(priceController!.text),
+          //               description: descriptionController!.text);
+          //           context
+          //               .read<AddProductBloc>()
+          //               .add(AddedProductEvent(model: requestData));
+          //         },
+          //         child: const Text('Add'));
+          //   },
+          // ),
+          //   ],
+          // );
           //   },
           // );
         },

@@ -43,5 +43,22 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         },
       );
     });
+
+    on<AddSingleProductsEvent>(
+      (event, emit) async {
+        final currentState = state as ProductsLoaded;
+
+        emit(
+          currentState.copyWith(
+            data: [...currentState.data, event.data],
+          ),
+        );
+      },
+    );
+    on<ClearProductEvent>(
+      (event, emit) async {
+        emit(ProductsInitial());
+      },
+    );
   }
 }
