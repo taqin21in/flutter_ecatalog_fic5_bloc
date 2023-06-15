@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ecatalog_fic5/data/datasources/products_datasource.dart';
 
@@ -11,10 +13,35 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   ProductsBloc(this.productsDataSource) : super(ProductsInitial()) {
     on<GetProductsEvent>((event, emit) async {
       emit(ProductsLoading());
-      final result = await productsDataSource.getAllProducts();
+      final result =
+          await productsDataSource.getPaginationProduct(offset: 0, limit: 50);
       result.fold(
         (error) => emit(ProductsError(message: error)),
-        (result) => emit(ProductsLoaded(data: result)),
+        (result) {
+          bool isNext = result.length == 50;
+          emit(ProductsLoaded(data: result, isNext: isNext));
+        },
+      );
+    });
+    on<NextProductsEvent>((event, emit) async {
+      final currentState = state as ProductsLoaded;
+      final result = await productsDataSource.getPaginationProduct(
+          offset: currentState.offset + 50, limit: 50);
+      result.fold(
+        (error) => emit(ProductsError(message: error)),
+        (result) {
+          bool isNext = result.length == 50;
+          // emit(
+          //   ProductsLoaded(
+          //       data: [...currentState.data, ...result],
+          //       offset: currentState.offset + 50,
+          //       isNext: isNext),
+          // );
+          emit(currentState.copyWith(
+              data: [...currentState.data, ...result],
+              offset: currentState.offset + 50,
+              isNext: isNext));
+        },
       );
     });
   }

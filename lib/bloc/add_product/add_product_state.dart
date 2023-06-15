@@ -7,7 +7,7 @@ class AddProductInitial extends AddProductState {}
 
 class AddProductsLoading extends AddProductState {}
 
-class AddProductsLoaded extends AddProductState {
+class AddProductsLoaded extends AddProductState  {
   final ProductsResponseModel model;
   AddProductsLoaded({
     required this.model,
