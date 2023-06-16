@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_ecatalog_fic5/bloc/update_product/update_product_bloc.dart';
 import 'package:flutter_ecatalog_fic5/data/datasources/local_datasource.dart';
+import 'package:flutter_ecatalog_fic5/data/models/request/update_product_request_model.dart';
 import 'package:flutter_ecatalog_fic5/presentation/add_product_page.dart';
 import 'package:flutter_ecatalog_fic5/presentation/login_page.dart';
-import '../bloc/add_product/add_product_bloc.dart';
 import '../bloc/products/products_bloc.dart';
-import '../data/models/request/product_request_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,6 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int? productId;
   TextEditingController? titleController;
   TextEditingController? priceController;
   TextEditingController? descriptionController;
@@ -86,23 +87,23 @@ class _HomePageState extends State<HomePage> {
                       ),
                       subtitle: Text('${state.data[index].price}\$'),
                       onTap: () {
-                        debugPrint('title ${state.data[index].title}');
-                        debugPrint('price ${state.data[index].price}');
-                        debugPrint(
-                            'description ${state.data[index].description}');
+                        titleController!.text = state.data[index].title!;
+                        priceController!.text =
+                            state.data[index].price.toString();
+                        descriptionController!.text =
+                            state.data[index].description.toString();
+                        productId = state.data[index].id;
                         showDialog(
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: const Text('Add Product'),
+                              title: Text(
+                                  'Update Product with ID : ${state.data.reversed.toList()[index].id}'),
                               content: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   TextField(
-                                    controller: TextEditingController.fromValue(
-                                        TextEditingValue(
-                                            text:
-                                                '${state.data[index].title}')),
+                                    controller: titleController,
                                     decoration: const InputDecoration(
                                         labelText: 'title'),
                                   ),
@@ -127,23 +128,23 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(
                                   width: 8,
                                 ),
-                                BlocConsumer<AddProductBloc, AddProductState>(
+                                BlocConsumer<UpdateProductBloc,
+                                    UpdateProductState>(
                                   listener: (context, state) {
-                                    if (state is AddProductsLoaded) {
+                                    if (state is UpdateProductLoaded) {
                                       const SnackBar(
                                         content:
                                             Text('Update Product is Success'),
                                       );
-                                      // context.read<ProductsBloc>().add(GetProductsEvent());
-                                      context.read<ProductsBloc>().add(
-                                          AddSingleProductsEvent(
-                                              data: state.model));
+                                      context
+                                          .read<ProductsBloc>()
+                                          .add(NextProductsEvent());
                                       titleController!.clear();
                                       priceController!.clear();
                                       descriptionController!.clear();
                                       Navigator.pop(context);
                                     }
-                                    if (state is AddProductsError) {
+                                    if (state is UpdateProductError) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
@@ -153,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                                     }
                                   },
                                   builder: (context, state) {
-                                    if (state is AddProductsLoading) {
+                                    if (state is UpdateProductLoading) {
                                       return const Center(
                                         child: CircularProgressIndicator(),
                                       );
@@ -161,17 +162,21 @@ class _HomePageState extends State<HomePage> {
                                     return ElevatedButton(
                                         onPressed: () {
                                           final requestData =
-                                              ProductsRequestModel(
+                                              UpdateProductRequestModel(
+                                                  images: List.empty(),
                                                   title: titleController!.text,
-                                                  price:
-                                                      int.parse(priceController!
-                                                          .text),
+                                                  price: int.parse(
+                                                      priceController!.text),
                                                   description:
                                                       descriptionController!
                                                           .text);
-                                          context.read<AddProductBloc>().add(
-                                              AddedProductEvent(
-                                                  model: requestData));
+                                          debugPrint(
+                                            'request data : ${requestData.toJson()}',
+                                          );
+                                          context.read<UpdateProductBloc>().add(
+                                              DoUpdatedProductEvent(
+                                                  model: requestData,
+                                                  productId: productId!));
                                         },
                                         child: const Text('Update Product'));
                                   },

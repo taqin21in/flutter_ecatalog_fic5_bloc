@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter_ecatalog_fic5/data/models/request/product_request_model.dart';
+import 'package:flutter_ecatalog_fic5/data/models/request/update_product_request_model.dart';
 import 'package:flutter_ecatalog_fic5/data/models/response/product_response_model.dart';
+import 'package:flutter_ecatalog_fic5/data/models/response/update_product_response_model.dart';
 import 'package:http/http.dart' as http;
 
 class ProductsDataSource {
@@ -49,6 +51,20 @@ class ProductsDataSource {
       return Right(ProductsResponseModel.fromJson(response.body));
     } else {
       return const Left('add Product is Error');
+    }
+  }
+
+  Future<Either<String, UpdateProductResponseModel>> updateProduct(
+      UpdateProductRequestModel model, productId) async {
+    final response = await http
+        .put(Uri.parse(
+            'https://api.escuelajs.co/api/v1/products/?id=$productId'))
+        .timeout(const Duration(seconds: 2));
+    if (response.statusCode == 200) {
+      return Right(
+          UpdateProductResponseModel.fromJson(jsonDecode(response.body)));
+    } else {
+      return const Left('update Product is Error');
     }
   }
 }

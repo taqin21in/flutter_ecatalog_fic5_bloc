@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ecatalog_fic5/bloc/add_product/add_product_bloc.dart';
 import 'package:flutter_ecatalog_fic5/bloc/register/register_bloc.dart';
 import 'package:flutter_ecatalog_fic5/bloc/splashscreen/splashscreen_bloc.dart';
+import 'package:flutter_ecatalog_fic5/bloc/update_product/update_product_bloc.dart';
 import 'package:flutter_ecatalog_fic5/data/datasources/auth_datasource.dart';
 import 'package:flutter_ecatalog_fic5/data/datasources/products_datasource.dart';
 import 'package:flutter_ecatalog_fic5/presentation/login_page.dart';
@@ -35,6 +36,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => SplashscreenBloc(),
+        ),
+        BlocProvider(
+          create: (context) => UpdateProductBloc(ProductsDataSource()),
         ),
       ],
       child: MaterialApp(
