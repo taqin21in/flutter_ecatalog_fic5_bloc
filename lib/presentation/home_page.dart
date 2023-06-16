@@ -83,8 +83,7 @@ class _HomePageState extends State<HomePage> {
                   return Card(
                     child: ListTile(
                       title: Text(
-                        state.data.toList()[index].title ?? '-',
-                      ),
+                          'ID : (${state.data[index].id}) - ${state.data[index].title}  '),
                       subtitle: Text(
                           '${state.data[index].price}\$ - ${state.data[index].description}'),
                       onTap: () {
@@ -99,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) {
                             return AlertDialog(
                               title: Text(
-                                  'Update Product with ID : ${state.data.toList()[index].id}'),
+                                  'Update Product with ID : ${state.data[index].id}'),
                               content: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
@@ -164,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                                       onPressed: () {
                                         final requestData =
                                             UpdateProductRequestModel(
-                                                images: List.empty(),
+                                                // images: List.empty(),
                                                 title: titleController!.text,
                                                 price: int.parse(
                                                     priceController!.text),
@@ -172,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                                                     descriptionController!
                                                         .text);
                                         debugPrint(
-                                          'request data : ${requestData.toJson()}',
+                                          'request data presentation : ${requestData.toJson()}',
                                         );
                                         debugPrint('productId : $productId');
                                         context.read<UpdateProductBloc>().add(

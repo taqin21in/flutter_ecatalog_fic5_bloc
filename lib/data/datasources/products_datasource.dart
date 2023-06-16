@@ -57,17 +57,30 @@ class ProductsDataSource {
 
   Future<Either<String, UpdateProductResponseModel>> updateProduct(
       UpdateProductRequestModel model, productId) async {
-    final response = await http
-        .put(Uri.parse('https://api.escuelajs.co/api/v1/products/$productId'),
-            body: jsonEncode(model))
-        .timeout(const Duration(seconds: 2));
-    debugPrint('request json ${jsonEncode(model.toJson())}');
-    debugPrint(jsonDecode(response.body).toString());
-    if (response.statusCode == 200) {
-      return Right(
-          UpdateProductResponseModel.fromJson(jsonDecode(response.body)));
-    } else {
-      return const Left('update Product is Error');
+    try {
+      debugPrint(
+        'request data with data source jsonEncode before sending ${jsonEncode(model.toJson())}',
+      );
+      final response = await http.put(
+        Uri.parse('https://api.escuelajs.co/api/v1/products/$productId'),
+        body: {
+          "title": model.title,
+          "price": model.price.toString(),
+          "description": model.description
+        },
+      );
+      debugPrint(
+        'result resposne from sever : ${jsonDecode(response.body).toString()}',
+      );
+      if (response.statusCode == 200) {
+        return Right(
+            UpdateProductResponseModel.fromJson(jsonDecode(response.body)));
+      } else {
+        return const Left('update Product is Error');
+      }
+    } catch (e) {
+      debugPrint(e.toString());
     }
+    return const Left('update Product is Error');
   }
 }

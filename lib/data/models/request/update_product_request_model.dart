@@ -4,12 +4,12 @@ class UpdateProductRequestModel {
   String title;
   int price;
   String description;
-  List<String> images;
+  // List<String> images;
 
   UpdateProductRequestModel({
     required this.title,
     required this.price,
-    required this.images,
+    // required this.images,
     required this.description,
   });
 
@@ -17,14 +17,14 @@ class UpdateProductRequestModel {
       UpdateProductRequestModel(
         title: json["title"],
         price: json["price"],
-        images: List<String>.from(json["images"].map((x) => x)),
+        // images: List<String>.from(json["images"].map((x) => x)),
         description: json["description"],
       );
 
   Map<String, dynamic> toJson() => {
         "title": title,
         "price": price,
-        "images": List<dynamic>.from(images.map((x) => x)),
+        // "images": List<dynamic>.from(images.map((x) => x)),
         "description": description,
       };
 
