@@ -1,31 +1,12 @@
 name: flutter_ecatalog_fic5
 description: A new Flutter project.
 
-
 publish_to: 'none' 
-
-
-
-
-
-
-
-
-
-
-
-
 
 version: 1.0.0+1
 
 environment:
   sdk: '>=3.0.3 <4.0.0'
-
-
-
-
-
-
 
 dependencies:
   cupertino_icons: ^1.0.2
@@ -41,15 +22,8 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
-
-
-
-
+    
 flutter:
-
-  
-  
-  
   uses-material-design: true
   
   

@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: const Text('Home'),
         elevation: 5,
         actions: [
           IconButton(
@@ -83,22 +83,23 @@ class _HomePageState extends State<HomePage> {
                   return Card(
                     child: ListTile(
                       title: Text(
-                        state.data.reversed.toList()[index].title ?? '-',
+                        state.data.toList()[index].title ?? '-',
                       ),
-                      subtitle: Text('${state.data[index].price}\$'),
+                      subtitle: Text(
+                          '${state.data[index].price}\$ - ${state.data[index].description}'),
                       onTap: () {
                         titleController!.text = state.data[index].title!;
                         priceController!.text =
-                            state.data[index].price.toString();
+                            state.data[index].price!.toString();
                         descriptionController!.text =
-                            state.data[index].description.toString();
-                        productId = state.data[index].id;
+                            state.data[index].description!;
+                        productId = state.data[index].id!;
                         showDialog(
                           context: context,
                           builder: (context) {
                             return AlertDialog(
                               title: Text(
-                                  'Update Product with ID : ${state.data.reversed.toList()[index].id}'),
+                                  'Update Product with ID : ${state.data.toList()[index].id}'),
                               content: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
@@ -138,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                                       );
                                       context
                                           .read<ProductsBloc>()
-                                          .add(NextProductsEvent());
+                                          .add(GetProductsEvent());
                                       titleController!.clear();
                                       priceController!.clear();
                                       descriptionController!.clear();
@@ -160,25 +161,27 @@ class _HomePageState extends State<HomePage> {
                                       );
                                     }
                                     return ElevatedButton(
-                                        onPressed: () {
-                                          final requestData =
-                                              UpdateProductRequestModel(
-                                                  images: List.empty(),
-                                                  title: titleController!.text,
-                                                  price: int.parse(
-                                                      priceController!.text),
-                                                  description:
-                                                      descriptionController!
-                                                          .text);
-                                          debugPrint(
-                                            'request data : ${requestData.toJson()}',
-                                          );
-                                          context.read<UpdateProductBloc>().add(
-                                              DoUpdatedProductEvent(
-                                                  model: requestData,
-                                                  productId: productId!));
-                                        },
-                                        child: const Text('Update Product'));
+                                      onPressed: () {
+                                        final requestData =
+                                            UpdateProductRequestModel(
+                                                images: List.empty(),
+                                                title: titleController!.text,
+                                                price: int.parse(
+                                                    priceController!.text),
+                                                description:
+                                                    descriptionController!
+                                                        .text);
+                                        debugPrint(
+                                          'request data : ${requestData.toJson()}',
+                                        );
+                                        debugPrint('productId : $productId');
+                                        context.read<UpdateProductBloc>().add(
+                                            DoUpdatedProductEvent(
+                                                model: requestData,
+                                                productId: productId!));
+                                      },
+                                      child: const Text('Update Product'),
+                                    );
                                   },
                                 ),
                               ],

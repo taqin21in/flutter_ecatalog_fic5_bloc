@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_ecatalog_fic5/data/models/request/product_request_model.dart';
 import 'package:flutter_ecatalog_fic5/data/models/request/update_product_request_model.dart';
 import 'package:flutter_ecatalog_fic5/data/models/response/product_response_model.dart';
@@ -57,9 +58,11 @@ class ProductsDataSource {
   Future<Either<String, UpdateProductResponseModel>> updateProduct(
       UpdateProductRequestModel model, productId) async {
     final response = await http
-        .put(Uri.parse(
-            'https://api.escuelajs.co/api/v1/products/?id=$productId'))
+        .put(Uri.parse('https://api.escuelajs.co/api/v1/products/$productId'),
+            body: jsonEncode(model))
         .timeout(const Duration(seconds: 2));
+    debugPrint('request json ${jsonEncode(model.toJson())}');
+    debugPrint(jsonDecode(response.body).toString());
     if (response.statusCode == 200) {
       return Right(
           UpdateProductResponseModel.fromJson(jsonDecode(response.body)));
