@@ -15,7 +15,7 @@ import '../models/response/upload_image_response_model.dart';
 class ProductsDataSource {
   Future<Either<String, List<ProductsResponseModel>>> getAllProducts() async {
     final response =
-        await http.get(Uri.parse('http://103.150.116.14:1337/api/products/'));
+        await http.get(Uri.parse('https://api.escuelajs.co/api/v1/products/'));
     if (response.statusCode == 200) {
       return Right(
         List<ProductsResponseModel>.from(
@@ -32,7 +32,7 @@ class ProductsDataSource {
   Future<Either<String, List<ProductsResponseModel>>> getPaginationProduct(
       {required int offset, required int limit}) async {
     final response = await http.get(Uri.parse(
-        'http://103.150.116.14:1337/api/products/?offset=$offset&limit=$limit'));
+        'https://api.escuelajs.co/api/v1/products/?offset=$offset&limit=$limit'));
     if (response.statusCode == 200) {
       return Right(
         List<ProductsResponseModel>.from(
@@ -49,7 +49,7 @@ class ProductsDataSource {
   Future<Either<String, ProductsResponseModel>> createdProduct(
       ProductsRequestModel model) async {
     final response = await http.post(
-        Uri.parse('http://103.150.116.14:1337/api/products/'),
+        Uri.parse('https://api.escuelajs.co/api/v1/api/products/'),
         body: model.toJson(),
         headers: {'Content-Type': 'application/json'});
     if (response.statusCode == 201) {
@@ -66,7 +66,7 @@ class ProductsDataSource {
         'request data with data source jsonEncode before sending ${jsonEncode(model.toJson())}',
       );
       final response = await http.put(
-        Uri.parse('http://103.150.116.14:1337/api/products/$productId'),
+        Uri.parse('https://api.escuelajs.co/api/v1/products/$productId'),
         body: {
           "title": model.title,
           "price": model.price.toString(),
@@ -91,7 +91,7 @@ class ProductsDataSource {
   Future<Either<String, UploadImageResponseModel>> uploadImage(
     XFile image,
   ) async {
-    const baseUrl = "http://103.150.116.14:1337/api/upload/";
+    const baseUrl = "https://api.escuelajs.co/api/v1/files/upload";
     final request = http.MultipartRequest('POST', Uri.parse(baseUrl));
 
     final bytes = await image.readAsBytes();
