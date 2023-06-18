@@ -87,31 +87,32 @@ class ProductsDataSource {
     }
     return const Left('update Product is Error');
   }
-}
 
-Future<Either<String, UploadImageResponseModel>> uploadImage(
-    XFile image) async {
-  const baseUrl = "http://103.150.116.14:1337/api/upload/";
-  final request = http.MultipartRequest('POST', Uri.parse(baseUrl));
+  Future<Either<String, UploadImageResponseModel>> uploadImage(
+    XFile image,
+  ) async {
+    const baseUrl = "http://103.150.116.14:1337/api/upload/";
+    final request = http.MultipartRequest('POST', Uri.parse(baseUrl));
 
-  final bytes = await image.readAsBytes();
+    final bytes = await image.readAsBytes();
 
-  final multiPartFile = http.MultipartFile.fromBytes(
-    'file',
-    bytes,
-    filename: image.name,
-  );
+    final multiPartFile = http.MultipartFile.fromBytes(
+      'file',
+      bytes,
+      filename: image.path,
+    );
 
-  request.files.add(multiPartFile);
+    request.files.add(multiPartFile);
 
-  http.StreamedResponse response = await request.send();
+    http.StreamedResponse response = await request.send();
 
-  final Uint8List responseList = await response.stream.toBytes();
-  final String responseData = String.fromCharCodes(responseList);
+    final Uint8List responseList = await response.stream.toBytes();
+    final String responseData = String.fromCharCodes(responseList);
 
-  if (response.statusCode == 201) {
-    return Right(UploadImageResponseModel.fromJson(jsonDecode(responseData)));
-  } else {
-    return const Left("Failed Upload Image");
+    if (response.statusCode == 201) {
+      return Right(UploadImageResponseModel.fromJson(jsonDecode(responseData)));
+    } else {
+      return const Left("Failed Upload Image");
+    }
   }
 }

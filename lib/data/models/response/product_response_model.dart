@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // To parse this JSON data, do
 //
 //     final productsResponseModel = productsResponseModelFromMap(jsonString);
@@ -61,6 +62,11 @@ class ProductsResponseModel {
         "updatedAt": updatedAt?.toIso8601String(),
         "category": category?.toMap(),
       };
+
+  @override
+  String toString() {
+    return 'ProductsResponseModel(id: $id, title: $title, price: $price, description: $description, images: $images, creationAt: $creationAt, updatedAt: $updatedAt, category: $category)';
+  }
 }
 
 class Category {

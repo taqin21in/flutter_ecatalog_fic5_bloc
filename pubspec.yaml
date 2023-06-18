@@ -1,15 +1,14 @@
 name: flutter_ecatalog_fic5
 description: A new Flutter project.
 
-publish_to: 'none' 
+publish_to: "none"
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.3 <4.0.0'
+  sdk: ">=3.0.3 <4.0.0"
 
 dependencies:
- 
   camera: ^0.10.5+2
   cupertino_icons: ^1.0.2
   dartz: ^0.10.1
@@ -30,33 +29,9 @@ dev_dependencies:
   freezed: ^2.3.5
   json_serializable: ^6.7.0
 
-    
 flutter:
   uses-material-design: true
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+linter:
+  rules:
+    - non_constant_identifier_names

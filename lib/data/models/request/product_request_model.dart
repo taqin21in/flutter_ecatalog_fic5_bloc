@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // To parse this JSON data, do
 //
 //     final productsRequestModel = productsRequestModelFromMap(jsonString);
@@ -43,4 +44,20 @@ class ProductsRequestModel {
         "images":
             images == null ? [] : List<dynamic>.from(images!.map((x) => x)),
       };
+
+  ProductsRequestModel copyWith({
+    String? title,
+    int? price,
+    String? description,
+    int? categoryId,
+    List<String>? images,
+  }) {
+    return ProductsRequestModel(
+      title: title ?? this.title,
+      price: price ?? this.price,
+      description: description ?? this.description,
+      categoryId: categoryId ?? this.categoryId,
+      images: images ?? this.images,
+    );
+  }
 }
