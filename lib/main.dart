@@ -4,6 +4,7 @@ import 'package:flutter_ecatalog_fic5/bloc/add_product/add_product_bloc.dart';
 import 'package:flutter_ecatalog_fic5/bloc/register/register_bloc.dart';
 import 'package:flutter_ecatalog_fic5/bloc/splashscreen/splashscreen_bloc.dart';
 import 'package:flutter_ecatalog_fic5/bloc/update_productss_cubit_with_freezed/update_productss_cubit.dart';
+import 'package:flutter_ecatalog_fic5/bloc/upload_image_update/upload_image_update_cubit.dart';
 import 'package:flutter_ecatalog_fic5/data/datasources/auth_datasource.dart';
 import 'package:flutter_ecatalog_fic5/data/datasources/products_datasource.dart';
 import 'package:flutter_ecatalog_fic5/presentation/login_page.dart';
@@ -13,6 +14,7 @@ import 'bloc/products/products_bloc.dart';
 import 'bloc/login/login_bloc.dart';
 import 'bloc/update_product_bloc/update_product_bloc.dart';
 import 'bloc/update_products_bloc_with_freezed/update_products_bloc.dart';
+import 'bloc/upload_image/upload_gallery_camera_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,6 +50,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => UpdateProductssCubit(ProductsDataSource()),
+        ),
+        BlocProvider(
+          create: (context) => UploadGalleryCameraCubit(ProductsDataSource()),
+        ),
+        BlocProvider(
+          create: (context) => UploadImageUpdateCubit(ProductsDataSource()),
         ),
       ],
       child: MaterialApp(

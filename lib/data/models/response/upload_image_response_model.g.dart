@@ -6,6 +6,7 @@ part of 'upload_image_response_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+// ignore: non_constant_identifier_names
 _$_UploadImageResponseModel _$$_UploadImageResponseModelFromJson(
         Map<String, dynamic> json) =>
     _$_UploadImageResponseModel(
@@ -14,6 +15,7 @@ _$_UploadImageResponseModel _$$_UploadImageResponseModelFromJson(
       location: json['location'] as String,
     );
 
+// ignore: non_constant_identifier_names
 Map<String, dynamic> _$$_UploadImageResponseModelToJson(
         _$_UploadImageResponseModel instance) =>
     <String, dynamic>{

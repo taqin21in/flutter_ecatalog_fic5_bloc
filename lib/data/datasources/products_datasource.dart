@@ -49,7 +49,7 @@ class ProductsDataSource {
   Future<Either<String, ProductsResponseModel>> createdProduct(
       ProductsRequestModel model) async {
     final response = await http.post(
-        Uri.parse('https://api.escuelajs.co/api/v1/api/products/'),
+        Uri.parse('https://api.escuelajs.co/api/v1/products/'),
         body: model.toJson(),
         headers: {'Content-Type': 'application/json'});
     if (response.statusCode == 201) {
@@ -70,7 +70,8 @@ class ProductsDataSource {
         body: {
           "title": model.title,
           "price": model.price.toString(),
-          "description": model.description
+          "description": model.description,
+          "images": model.images
         },
       );
       debugPrint(
