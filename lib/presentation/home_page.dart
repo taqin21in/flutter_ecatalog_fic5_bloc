@@ -1,17 +1,16 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ecatalog_fic5/bloc/update_productss_cubit_with_freezed/update_productss_cubit.dart';
-import 'package:flutter_ecatalog_fic5/data/datasources/local_datasource.dart';
-import 'package:flutter_ecatalog_fic5/data/models/request/update_product_request_model.dart';
-import 'package:flutter_ecatalog_fic5/presentation/add_product_page.dart';
-import 'package:flutter_ecatalog_fic5/presentation/login_page.dart';
 import 'package:flutter_ecatalog_fic5/themes/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../bloc/products/products_bloc.dart';
+import '../bloc/upload_image_update/upload_image_update_cubit.dart';
+import '../data/datasources/local_datasource.dart';
+import '../data/models/request/update_product_request_model.dart';
+import 'add_product_page.dart';
 import 'camera_page.dart';
+import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,6 +21,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late int productId;
+  late List<String?> imageController;
   TextEditingController? titleController;
   TextEditingController? priceController;
   TextEditingController? descriptionController;
@@ -51,6 +51,7 @@ class _HomePageState extends State<HomePage> {
     titleController = TextEditingController();
     priceController = TextEditingController();
     descriptionController = TextEditingController();
+
     super.initState();
     context.read<ProductsBloc>().add(GetProductsEvent());
 
@@ -108,26 +109,21 @@ class _HomePageState extends State<HomePage> {
                   return Card(
                     child: ListTile(
                       title: Text(
-                          'ID : (${state.data.reversed.toList()[index].id}) - ${state.data.reversed.toList()[index].title}  '),
+                          'ID : (${state.data[index].id}) - ${state.data[index].title}  '),
                       subtitle: Text(
-                          '${state.data.reversed.toList()[index].price}\$ - ${state.data.reversed.toList()[index].description}'),
+                          '${state.data[index].price}\$ - ${state.data[index].description}'),
                       trailing: CircleAvatar(
                         backgroundImage: NetworkImage(
-                            state.data.reversed.toList()[index].images?[0] ??
+                            state.data[index].images?[0] ??
                                 'https://tinyurl.com/default-fic'),
                       ),
                       onTap: () {
-                        titleController!.text =
-                            state.data.reversed.toList()[index].title!;
-                        priceController!.text = state.data.reversed
-                            .toList()[index]
-                            .price!
-                            .toString();
+                        titleController!.text = state.data[index].title!;
+                        priceController!.text =
+                            state.data[index].price!.toString();
                         descriptionController!.text =
                             state.data.reversed.toList()[index].description!;
                         productId = state.data.reversed.toList()[index].id!;
-                        img = state.data.reversed.toList()[index].images?[0] ??
-                            'https://tinyurl.com/default-fic';
                         showDialog(
                           context: context,
                           builder: (context) {
@@ -143,15 +139,15 @@ class _HomePageState extends State<HomePage> {
                                     const SizedBox(
                                       height: 16,
                                     ),
-                                    picture != null
+                                    state.data[index].images != null
                                         ? SizedBox(
                                             height: 200,
                                             width: 200,
-                                            child: img != null
-                                                ? Image.network(img!)
-                                                : Image.file(
-                                                    File(picture!.path),
-                                                  ),
+                                            child: CircleAvatar(
+                                              backgroundImage: NetworkImage(state
+                                                      .data[index].images?[0] ??
+                                                  'https://tinyurl.com/default-fic'),
+                                            ),
                                           )
                                         : Container(
                                             height: 200,
@@ -183,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             );
                                           },
-                                          child: const Text('capture'),
+                                          child: const Text('camera'),
                                         ),
                                         const SizedBox(
                                           width: 8,
@@ -218,14 +214,14 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 actions: [
                                   /// start freez annotation with cubit
-                                  BlocListener<UpdateProductssCubit,
-                                      UpdateProductssState>(
+                                  BlocListener<UploadImageUpdateCubit,
+                                      UploadImageUpdateState>(
                                     listener: (context, state) {
                                       state.maybeWhen(
-                                        loaded: (model) {
-                                          const SnackBar(
+                                        loaded: (model, productId) {
+                                          SnackBar(
                                             content: Text(
-                                                'Update Product is Success'),
+                                                'Update Product is Success with product Id $productId'),
                                           );
                                           context
                                               .read<ProductsBloc>()
@@ -233,13 +229,14 @@ class _HomePageState extends State<HomePage> {
                                           titleController!.clear();
                                           priceController!.clear();
                                           descriptionController!.clear();
+                                          picture = null;
                                           Navigator.pop(context);
                                         },
                                         orElse: () {},
                                       );
                                     },
-                                    child: BlocBuilder<UpdateProductssCubit,
-                                        UpdateProductssState>(
+                                    child: BlocBuilder<UploadImageUpdateCubit,
+                                        UploadImageUpdateState>(
                                       builder: (context, state) {
                                         return state.maybeWhen(
                                           orElse: () {
@@ -247,21 +244,24 @@ class _HomePageState extends State<HomePage> {
                                               onPressed: () {
                                                 final requestData =
                                                     UpdateProductRequestModel(
-                                                        // images: List.empty(),
-                                                        title: titleController!
-                                                            .text,
-                                                        price: int.parse(
-                                                            priceController!
-                                                                .text),
-                                                        description:
-                                                            descriptionController!
-                                                                .text);
+                                                  title: titleController!.text,
+                                                  price: int.parse(
+                                                      priceController!.text),
+                                                  description:
+                                                      descriptionController!
+                                                          .text,
+                                                  images: [picture!.path],
+                                                );
                                                 context
                                                     .read<
-                                                        UpdateProductssCubit>()
-                                                    .updateProduct(
-                                                        model: requestData,
-                                                        productId: productId);
+                                                        UploadImageUpdateCubit>()
+                                                    .updateProducts(
+                                                      model: requestData,
+                                                      productId: productId,
+                                                      image: XFile(
+                                                        picture!.path[0],
+                                                      ),
+                                                    );
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: context
