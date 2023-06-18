@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ecatalog_fic5/bloc/update_productss_cubit_with_freezed/update_productss_cubit.dart';
@@ -6,7 +9,9 @@ import 'package:flutter_ecatalog_fic5/data/models/request/update_product_request
 import 'package:flutter_ecatalog_fic5/presentation/add_product_page.dart';
 import 'package:flutter_ecatalog_fic5/presentation/login_page.dart';
 import 'package:flutter_ecatalog_fic5/themes/app_theme.dart';
+import 'package:image_picker/image_picker.dart';
 import '../bloc/products/products_bloc.dart';
+import 'camera_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -21,6 +26,23 @@ class _HomePageState extends State<HomePage> {
   TextEditingController? priceController;
   TextEditingController? descriptionController;
   final scrollController = ScrollController();
+  XFile? picture;
+  void takePicture(XFile file) {
+    picture = file;
+    setState(() {});
+  }
+
+  Future<void> getImage(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? photo = await picker.pickImage(
+      source: source,
+      imageQuality: 50,
+    );
+    if (photo != null) {
+      picture = photo;
+      setState(() {});
+    }
+  }
 
   @override
   void initState() {
@@ -87,6 +109,11 @@ class _HomePageState extends State<HomePage> {
                           'ID : (${state.data.reversed.toList()[index].id}) - ${state.data.reversed.toList()[index].title}  '),
                       subtitle: Text(
                           '${state.data.reversed.toList()[index].price}\$ - ${state.data.reversed.toList()[index].description}'),
+                      trailing: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            state.data.reversed.toList()[index].images?[0] ??
+                                'https://tinyurl.com/default-fic'),
+                      ),
                       onTap: () {
                         titleController!.text =
                             state.data.reversed.toList()[index].title!;
@@ -109,20 +136,75 @@ class _HomePageState extends State<HomePage> {
                                 content: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    picture != null
+                                        ? SizedBox(
+                                            height: 200,
+                                            width: 200,
+                                            child:
+                                                Image.file(File(picture!.path)))
+                                        : Container(
+                                            height: 200,
+                                            width: 200,
+                                            decoration: BoxDecoration(
+                                                border: Border.all()),
+                                          ),
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: context
+                                                  .theme.appColors.primary),
+                                          onPressed: () async {
+                                            await availableCameras().then(
+                                              (value) => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (_) {
+                                                  return CameraPage(
+                                                    takePicture: takePicture,
+                                                    cameras: value,
+                                                  );
+                                                }),
+                                              ),
+                                            );
+                                          },
+                                          child: const Text('capture'),
+                                        ),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: context
+                                                  .theme.appColors.primary),
+                                          onPressed: () async {
+                                            getImage(ImageSource.gallery);
+                                          },
+                                          child: const Text('Gallery'),
+                                        ),
+                                      ],
+                                    ),
                                     TextField(
                                       controller: titleController,
                                       decoration: const InputDecoration(
-                                          labelText: 'title'),
+                                          labelText: 'Title'),
                                     ),
                                     TextField(
                                       controller: priceController,
                                       decoration: const InputDecoration(
-                                          labelText: 'price'),
+                                          labelText: 'Price'),
                                     ),
                                     TextField(
                                       controller: descriptionController,
                                       decoration: const InputDecoration(
-                                          labelText: 'description'),
+                                          labelText: 'Description'),
                                     ),
                                   ],
                                 ),
