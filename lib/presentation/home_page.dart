@@ -25,6 +25,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController? titleController;
   TextEditingController? priceController;
   TextEditingController? descriptionController;
+  String? img;
+
   final scrollController = ScrollController();
   XFile? picture;
   void takePicture(XFile file) {
@@ -124,6 +126,8 @@ class _HomePageState extends State<HomePage> {
                         descriptionController!.text =
                             state.data.reversed.toList()[index].description!;
                         productId = state.data.reversed.toList()[index].id!;
+                        img = state.data.reversed.toList()[index].images?[0] ??
+                            'https://tinyurl.com/default-fic';
                         showDialog(
                           context: context,
                           builder: (context) {
@@ -143,8 +147,12 @@ class _HomePageState extends State<HomePage> {
                                         ? SizedBox(
                                             height: 200,
                                             width: 200,
-                                            child:
-                                                Image.file(File(picture!.path)))
+                                            child: img != null
+                                                ? Image.network(img!)
+                                                : Image.file(
+                                                    File(picture!.path),
+                                                  ),
+                                          )
                                         : Container(
                                             height: 200,
                                             width: 200,

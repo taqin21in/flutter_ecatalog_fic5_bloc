@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ecatalog_fic5/bloc/upload_image/upload_gallery_camera_cubit.dart';
-import 'package:flutter_ecatalog_fic5/presentation/camera_page.dart';
 import 'package:flutter_ecatalog_fic5/themes/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -21,7 +19,6 @@ class _AddProductPageState extends State<AddProductPage> {
   TextEditingController? titleController;
   TextEditingController? priceController;
   TextEditingController? descriptionController;
-
   XFile? picture;
 
   // List<XFile>? multiplePicture;
@@ -38,10 +35,10 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   void initState() {
-    super.initState();
     titleController = TextEditingController();
     priceController = TextEditingController();
     descriptionController = TextEditingController();
+    super.initState();
   }
 
   Future<void> getImage(ImageSource source) async {
@@ -66,10 +63,10 @@ class _AddProductPageState extends State<AddProductPage> {
   // }
   @override
   void dispose() {
-    super.dispose();
     titleController!.dispose();
     priceController!.dispose();
     descriptionController!.dispose();
+    super.dispose();
   }
 
   @override
@@ -79,8 +76,10 @@ class _AddProductPageState extends State<AddProductPage> {
         title: const Text("Add Product Catalog"),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(
               height: 16,
@@ -89,7 +88,8 @@ class _AddProductPageState extends State<AddProductPage> {
                 ? SizedBox(
                     height: 200,
                     width: 200,
-                    child: Image.file(File(picture!.path)))
+                    child: Image.file(File(picture!.path)),
+                  )
                 : Container(
                     height: 200,
                     width: 200,
@@ -117,17 +117,17 @@ class _AddProductPageState extends State<AddProductPage> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: context.theme.appColors.primary),
                   onPressed: () async {
-                    await availableCameras().then(
-                      (value) => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) {
-                          return CameraPage(
-                            takePicture: takePicture,
-                            cameras: value,
-                          );
-                        }),
-                      ),
-                    );
+                    // await availableCameras().then(
+                    //   (value) => Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(builder: (_) {
+                    //       return CameraPage(
+                    //         takePicture: takePicture,
+                    //         cameras: value,
+                    //       );
+                    //     }),
+                    //   ),
+                    // );
                   },
                   child: const Text('Camera'),
                 ),
@@ -145,6 +145,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 ),
               ],
             ),
+
             TextField(
               controller: titleController,
               decoration: const InputDecoration(labelText: 'Title'),
@@ -158,9 +159,9 @@ class _AddProductPageState extends State<AddProductPage> {
               decoration: const InputDecoration(labelText: 'Description'),
             ),
             const SizedBox(
-              height: 8,
+              height: 16,
             ),
-            BlocListener<UploadGalleryCameraCubit, UploadGalleryCameraState>(
+            BlocConsumer<UploadGalleryCameraCubit, UploadGalleryCameraState>(
               listener: (context, state) {
                 state.maybeWhen(error: (message) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -182,36 +183,27 @@ class _AddProductPageState extends State<AddProductPage> {
                   );
                 });
               },
-              child: BlocBuilder<UploadGalleryCameraCubit,
-                  UploadGalleryCameraState>(
-                builder: (context, state) {
-                  return state.maybeMap(
-                    orElse: () {
-                      return ElevatedButton(
-                          onPressed: () {
-                            final requestData = ProductsRequestModel(
-                              title: titleController!.text,
-                              price: int.parse(priceController!.text),
-                              description: descriptionController!.text,
-                              images: [picture!.path],
-                            );
-                            context
-                                .read<UploadGalleryCameraCubit>()
-                                .addProducts(
-                                    model: requestData, image: picture!);
-                          },
-                          child: const Text('Capture '));
-                    },
-                    loading: (value) {
-                      debugPrint('value loading $value');
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    },
-                  );
-                },
-              ),
+              builder: (context, state) {
+                return state.maybeWhen(
+                  orElse: () {
+                    return ElevatedButton(
+                        onPressed: () {
+                          final requestData = ProductsRequestModel(
+                            title: titleController!.text,
+                            price: int.parse(priceController!.text),
+                            description: descriptionController!.text,
+                            images: [picture!.path],
+                          );
+                          context
+                              .read<UploadGalleryCameraCubit>()
+                              .addProducts(model: requestData, image: picture!);
+                        },
+                        child: const Text('Capture'));
+                  },
+                );
+              },
             ),
+
             // BlocConsumer<AddProductBloc, AddProductState>(
             //   listener: (context, state) {
             //     if (state is AddProductsLoaded) {

@@ -19,16 +19,15 @@ class UploadGalleryCameraCubit extends Cubit<UploadGalleryCameraState> {
       {required ProductsRequestModel model, required XFile image}) async {
     emit(const UploadGalleryCameraState.loading());
     final uploadResult = await dataSource.uploadImage(image);
-    uploadResult.fold((error) => emit(UploadGalleryCameraState.error(error)),
-        (uploadImage) async {
+    uploadResult.fold((error) => emit(_$_Error(error)), (uploadImage) async {
       final result = await dataSource.createdProduct(
         model.copyWith(
           images: [uploadImage.location],
         ),
       );
       result.fold(
-        (error) => emit(UploadGalleryCameraState.error(error)),
-        (data) => emit(UploadGalleryCameraState.loaded(data)),
+        (error) => emit(_$_Error(error)),
+        (data) => emit(_Loaded(data)),
       );
     });
   }
